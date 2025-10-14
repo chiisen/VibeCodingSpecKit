@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spec Kit 一頁式介紹｜Spec-Driven Development</title>
+  <meta name="description" content="快速認識 GitHub Spec Kit 與 Spec-Driven Development；了解核心理念、開發流程與入門方式。">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: radial-gradient(circle at 10% 20%, #12204b 0%, #050816 60%, #010104 100%);
+      --bg-panel: rgba(8, 17, 40, 0.7);
+      --accent: #38f9d7;
+      --accent-soft: rgba(56, 249, 215, 0.1);
+      --text-primary: #f7f9ff;
+      --text-muted: #9ba8d9;
+      --border: rgba(56, 249, 215, 0.25);
+      --shadow: 0 32px 70px -32px rgba(56, 249, 215, 0.25);
+      --max-width: 1080px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(5, 8, 22, 0.82);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      margin: 0 auto;
+      max-width: var(--max-width);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(56, 249, 215, 0.4));
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.25rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      position: relative;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 6.5rem 1.5rem 4.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(56, 249, 215, 0.18) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      font-size: clamp(2.5rem, 4vw, 3.2rem);
+      letter-spacing: 0.09em;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .hero p {
+      max-width: 38ch;
+      color: var(--text-muted);
+    }
+
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.85rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(56, 249, 215, 0.95), rgba(122, 100, 255, 0.9));
+      color: #020409;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+    }
+
+    .btn-secondary {
+      border-color: var(--border);
+      color: var(--accent);
+      background: rgba(8, 17, 40, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(8, 17, 40, 0.7);
+    }
+
+    .terminal {
+      background: rgba(8, 17, 40, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 25px 50px -20px rgba(2, 8, 25, 0.8);
+      font-family: 'Inconsolata', 'Courier New', monospace;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .terminal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(56, 249, 215, 0.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .terminal pre {
+      margin: 0;
+      color: #b6ffe9;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+
+    .section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .section h2 {
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-panel);
+      border-radius: 18px;
+      padding: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent-soft), rgba(122, 100, 255, 0.06));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(56, 249, 215, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .timeline-item {
+      padding: 1.75rem;
+      border-left: 2px solid var(--border);
+      background: rgba(8, 17, 40, 0.65);
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 1.75rem;
+      left: -9px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px rgba(56, 249, 215, 0.6);
+    }
+
+    .timeline-item h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      padding: 3rem 1.5rem 4rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      background: rgba(2, 8, 25, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 720px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav ul {
+        flex-wrap: wrap;
+      }
+
+      .hero {
+        padding-top: 5.5rem;
+      }
+
+      .cta-group {
+        width: 100%;
+      }
+
+      .btn {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="brand">
+        <img src="../images/logo_small.png" alt="Spec Kit Logo">
+        Spec Kit
+      </div>
+      <ul>
+        <li><a href="#about">SDD 核心</a></li>
+        <li><a href="#start">快速入門</a></li>
+        <li><a href="#philosophy">理念</a></li>
+        <li><a href="#phases">開發流程</a></li>
+        <li><a href="#agents">AI 協作</a></li>
+        <li><a href="#resources">資源</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div>
+        <div class="badge">選用風格｜未來科技風</div>
+        <h1>Spec-Driven Development 重新定義開發體驗</h1>
+        <p>GitHub Spec Kit 讓規格成為可執行的核心產物。從想法到部署，透過自動化 CLI 與 AI 協作流程，專注在打造真正重要的產品情境。</p>
+        <div class="cta-group">
+          <a class="btn btn-primary" href="https://github.com/github/spec-kit" target="_blank" rel="noopener">前往 GitHub</a>
+          <a class="btn btn-secondary" href="#start">探索入門流程</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Specify CLI 範例">
+        <pre><code>$ uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+$ specify init my-product-spec
+$ specify check
+
+# 規格為真。程式碼跟隨規格。
+</code></pre>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div>
+        <h2>Spec-Driven Development 是什麼？</h2>
+        <p>Spec-Driven Development（SDD）顛覆傳統先寫程式後看規格的模式。規格不再只是一次性的文件，而是驅動開發的真實來源：藉由可執行的 specification，直接產出符合情境的實作。Spec Kit 提供工具鏈與最佳實踐，讓團隊以規格為中心展開協作，確保需求、設計與交付一致。</p>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>為什麼選擇 SDD</h3>
+          <ul>
+            <li>以規格為單一真實來源，減少溝通落差。</li>
+            <li>自動化產生程式碼，將人力專注在產品差異化。</li>
+            <li>規格、流程、實作同時演進，加速迭代。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Spec Kit 提供什麼</h3>
+          <ul>
+            <li>Specify CLI：初始化、驗證、執行規格。</li>
+            <li>分層章程：Constitution、核心指令與工作流程。</li>
+            <li>AI Agents 指南：與 Claude、Copilot 等工具協作。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>立即可用的成果</h3>
+          <ul>
+            <li>一鍵建立規格倉庫與專案骨架。</li>
+            <li>嚴謹驗證指令確保規格品質。</li>
+            <li>逐步開發任務分解與自動化實施。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="start">
+      <div>
+        <h2>快速入門：3 個步驟啟動</h2>
+        <p>使用 <strong>Specify CLI</strong> 可以在幾分鐘內準備好 SDD 工作環境。建議透過 <code>uv tool</code> 安裝以便於版本管理。</p>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>01｜安裝指定工具</h3>
+          <p>持久安裝（建議）：</p>
+          <pre><code>uv tool install specify-cli \
+  --from git+https://github.com/github/spec-kit.git</code></pre>
+          <p>一次性使用：</p>
+          <pre><code>uvx --from git+https://github.com/github/spec-kit.git \
+  specify init &lt;PROJECT_NAME&gt;</code></pre>
+        </article>
+        <article class="card">
+          <h3>02｜初始化專案</h3>
+          <p>建立全新 spec 專案骨架：</p>
+          <pre><code>specify init my-product-spec</code></pre>
+          <ul>
+            <li>自動生成 constitution 與核心流程。</li>
+            <li>建立規格資料夾、模板與工具設定。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>03｜品質檢查</h3>
+          <p>確保規格與流程一致：</p>
+          <pre><code>specify check</code></pre>
+          <ul>
+            <li>驗證章程、規格與任務清單。</li>
+            <li>及早發現缺漏與衝突。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="philosophy">
+      <div>
+        <h2>核心哲學</h2>
+        <p>Spec Kit 以三大支柱構成一套系統化的開發方法，確保團隊在規格驅動下保持靈活、快速且高品質。</p>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Constitution 章程</h3>
+          <ul>
+            <li>定義專案的核心原則、語彙與節奏。</li>
+            <li>建立 AI 協作守則，避免偏離目標。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Core Commands</h3>
+          <ul>
+            <li><code>/specify</code>：釐清需求與約束。</li>
+            <li><code>/plan</code>：產出實作藍圖與風險清單。</li>
+            <li><code>/tasks</code>：拆解為可執行任務，支援 TDD/BDD。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>AI Co-pilot</h3>
+          <ul>
+            <li>明確指示 Claude Code、Copilot、Gemini CLI 的角色。</li>
+            <li>讓 AI 負責重複性工作，人類聚焦產品價值。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="phases">
+      <div>
+        <h2>三階段開發流程</h2>
+        <p>SDD 將開發流程拆分為三個循環階段，從提案、實作到封存都與規格緊密連結。</p>
+      </div>
+      <div class="timeline">
+        <article class="timeline-item">
+          <h3>Stage 1｜Creating Changes</h3>
+          <p>針對新功能或大幅調整建立 proposal，撰寫變更動機、影響與 spec delta。使用 <code>openspec validate --strict</code> 確保規格正確。</p>
+        </article>
+        <article class="timeline-item">
+          <h3>Stage 2｜Implementing Changes</h3>
+          <p>依據核準的 proposal 與 tasks.md 執行實作。每一步都有 AI 協作提示，遵循章程與測試策略。</p>
+        </article>
+        <article class="timeline-item">
+          <h3>Stage 3｜Archiving Changes</h3>
+          <p>部署完成後，在變更存檔中保留歷史，維持 specs 為唯一真實來源，並為後續改善留下 traceability。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="agents">
+      <div>
+        <h2>支援的 AI 協作夥伴</h2>
+        <p>Spec Kit 內建針對多種 AI 工具的操作指引。透過一致的指令語彙與檢查清單，降低溝通與交接成本。</p>
+      </div>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Claude Code</h3>
+          <ul>
+            <li>協助審閱章程、調整計畫與驗證任務。</li>
+            <li>可自動生成 PR 描述與檢查清單。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>GitHub Copilot</h3>
+          <ul>
+            <li>配合規格產出樣板碼。</li>
+            <li>在 IDE 中提供即時建議與測試片段。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Gemini CLI / 其他 Agents</h3>
+          <ul>
+            <li>以同一套流程指令進行協作。</li>
+            <li>善用 `openspec` 工具鏈進行驗證與封存。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="resources">
+      <div>
+        <h2>更多資源與支持</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>官方文件</h3>
+            <ul>
+              <li><a href="https://github.github.io/spec-kit/" target="_blank" rel="noopener">GitHub Pages Docs</a></li>
+              <li><a href="https://github.com/github/spec-kit" target="_blank" rel="noopener">GitHub Repository</a></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>範例研究</h3>
+            <ul>
+              <li>參考 README 內的 Video Overview。</li>
+              <li>學習 Constitution 與實務範本。</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>社群與維護者</h3>
+            <ul>
+              <li>主要 Maintainers：@localden、@jflam。</li>
+              <li>提案與支援：開啟 GitHub Issue。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Spec Kit 讓規格與程式碼同步演進。遵循規格，釋放創造力。</p>
+    <p><a href="https://github.com/github/spec-kit" target="_blank" rel="noopener">https://github.com/github/spec-kit</a></p>
+  </footer>
+</body>
+</html>
